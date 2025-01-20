@@ -7,18 +7,18 @@ from generator import *
 class TestCourierCreateAPI:
     @allure.description('Проверяем успешное создание курьера')
     @allure.title('Создание курьера с новыми данными')
-    def test_courier_create_new_courier_success(self, delete_user):
-        user_data = delete_user[0]
+    def test_courier_create_new_courier_success(self, create_and_delete_user):
+        user_data = create_and_delete_user[0]
 
         assert user_data.status_code == 201 and user_data.json()['ok'] == True
 
     @allure.description('Проверяем создание курьера с использованием уже существующих данных')
     @allure.title('Создание курьера с повторными данными')
-    def test_courier_create_already_existing_user_fail(self, delete_user):
+    def test_courier_create_already_existing_user_fail(self, create_and_delete_user):
         exist_login_courier = {
-        "login": delete_user[1][0],
-        "password": delete_user[1][1],
-        "firstName": delete_user[1][2]
+        "login": create_and_delete_user[1][0],
+        "password": create_and_delete_user[1][1],
+        "firstName": create_and_delete_user[1][2]
     }
 
         r = requests.post(TestAPICourierLinks.main_url + TestAPICourierLinks.courier_url, data=exist_login_courier)
@@ -38,18 +38,18 @@ class TestCourierCreateAPI:
 class TestCourierLoginAPI:
     @allure.description('Проверяем попытку входа с отправкой существующих данных')
     @allure.title('Успешный вход по ручке логина')
-    def test_courier_login_success(self, delete_user):
-        login_courier = {"login": delete_user[1][0],
-                        "password": delete_user[1][1]}
+    def test_courier_login_success(self, create_and_delete_user):
+        login_courier = {"login": create_and_delete_user[1][0],
+                        "password": create_and_delete_user[1][1]}
         r = requests.post(TestAPICourierLinks.main_url + TestAPICourierLinks.login_url, data=login_courier)
 
         assert r.status_code == 200 and r.json()['id'] > 0
 
     @allure.description('Проверяем попытку входа с отправкой несуществующих данных')
     @allure.title('Вход с несуществующим юзером')
-    def test_courier_login_no_such_user_fail(self, delete_user):
-        login_courier = {"login": delete_user[1][1],
-                        "password": delete_user[1][0]}
+    def test_courier_login_no_such_user_fail(self, create_and_delete_user):
+        login_courier = {"login": create_and_delete_user[1][1],
+                        "password": create_and_delete_user[1][0]}
         r = requests.post(TestAPICourierLinks.main_url + TestAPICourierLinks.login_url, data=login_courier)
 
         assert r.status_code == 404 and r.json()['message'] == CourierErrors.error_login_no_such_user
@@ -88,9 +88,9 @@ class TestCourierDeleteAPI:
 
     @allure.description('Проверяем удаление курьера без отправки id в теле запроса')
     @allure.title('Удаление курьера без отправки id')
-    def test_courier_delete_without_id_fail(self, delete_user):
-        login_courier = {"login": delete_user[1][0],
-                         "password": delete_user[1][1]}
+    def test_courier_delete_without_id_fail(self, create_and_delete_user):
+        login_courier = {"login": create_and_delete_user[1][0],
+                         "password": create_and_delete_user[1][1]}
         r = requests.post(TestAPICourierLinks.main_url + TestAPICourierLinks.login_url, data=login_courier)
         courier_id = r.json()["id"]
         payload = {"id": ""}

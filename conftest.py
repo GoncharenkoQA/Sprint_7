@@ -1,11 +1,11 @@
-import requests
+
 import pytest
 from generator import *
 from static_data import TestAPICourierLinks
 
 
 @pytest.fixture()
-def delete_user():
+def create_and_delete_user():
     response, login_pass = register_new_courier_and_return_login_password()
     yield response, login_pass
 

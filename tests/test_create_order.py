@@ -45,9 +45,9 @@ class TestTrackOrder:
 class TestAcceptOrder:
     @allure.description('Успешный акцепт заказа')
     @allure.title('Прием заказа курьером')
-    def test_order_accept_success(self, delete_user):
-        new_courier = {"login": delete_user[1][0],
-                        "password": delete_user[1][1]}
+    def test_order_accept_success(self, create_and_delete_user):
+        new_courier = {"login": create_and_delete_user[1][0],
+                        "password": create_and_delete_user[1][1]}
         courier_signin = requests.post(TestAPICourierLinks.main_url + TestAPICourierLinks.login_url, data=new_courier)
         courier_id = courier_signin.json()['id']
 
@@ -63,9 +63,9 @@ class TestAcceptOrder:
 
     @allure.description('Акцепт заказа при отправке данных без id курьера')
     @allure.title('Прием заказа без id курьера')
-    def test_order_accept_no_courier_id_fail(self, delete_user):
-        new_courier = {"login": delete_user[1][0],
-                       "password": delete_user[1][1]}
+    def test_order_accept_no_courier_id_fail(self, create_and_delete_user):
+        new_courier = {"login": create_and_delete_user[1][0],
+                       "password": create_and_delete_user[1][1]}
         courier_signin = requests.post(TestAPICourierLinks.main_url + TestAPICourierLinks.login_url, data=new_courier)
         courier_id = courier_signin.json()['id']
 
@@ -82,9 +82,9 @@ class TestAcceptOrder:
 
     @allure.description('Акцепт заказа при отправке данных без id заказа')
     @allure.title('Прием заказа без id заказа')
-    def test_order_accept_no_order_id_fail(self, delete_user):
-        new_courier = {"login": delete_user[1][0],
-                           "password": delete_user[1][1]}
+    def test_order_accept_no_order_id_fail(self, create_and_delete_user):
+        new_courier = {"login": create_and_delete_user[1][0],
+                           "password": create_and_delete_user[1][1]}
         courier_signin = requests.post(TestAPICourierLinks.main_url + TestAPICourierLinks.login_url, data=new_courier)
         courier_id = courier_signin.json()['id']
 
