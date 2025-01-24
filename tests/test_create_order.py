@@ -8,7 +8,7 @@ class TestCreateOrder:
     @allure.description('Создаем заказ с разными цветами и без выбора цвета')
     @allure.title('Создание заказа с разными цветами')
     @pytest.mark.parametrize('color', (["BLACK"], ["GREY"], ["BLACK", "GREY"], []))
-    def test_order_creation_with_different_colors_success(self, color):
+    def test_order_creation_with_different_colors_success(self, color, cancel_order_after_tests):
         TestOrder.test_order["color"] = [color]
         payload = json.dumps(TestOrder.test_order)
         response = requests.post(TestAPIOrdersLinks.main_url + TestAPIOrdersLinks.main_orders_url, data=payload)
@@ -18,16 +18,15 @@ class TestCreateOrder:
 class TestTrackOrder:
     @allure.description('Получаем данные о заказе успешно')
     @allure.title('Получение данных о заказе')
-    def test_order_track_success(self):
-        new_track = create_new_order()
-        payload = {"t": new_track}
-        response = requests.get(TestAPIOrdersLinks.main_url + TestAPIOrdersLinks.track_order_url + str(new_track), data=payload)
+    def test_order_track_success(self, cancel_order_after_tests):
+        new_track = cancel_order_after_tests
+        response = requests.get(TestAPIOrdersLinks.main_url + TestAPIOrdersLinks.track_order_url + str(new_track))
         assert response.status_code == 200 and 'order' in response.text
 
     @allure.description('Получаем данные о заказе без номера заказа')
     @allure.title('Получение данных о заказе без номера')
-    def test_order_track_no_order_id_fail(self):
-        new_track = create_new_order()
+    def test_order_track_no_order_id_fail(self, cancel_order_after_tests):
+        new_track = cancel_order_after_tests
         payload = {"t": new_track}
         response = requests.get(TestAPIOrdersLinks.main_url + TestAPIOrdersLinks.track_order_url, data=payload)
 
@@ -45,13 +44,13 @@ class TestTrackOrder:
 class TestAcceptOrder:
     @allure.description('Успешный акцепт заказа')
     @allure.title('Прием заказа курьером')
-    def test_order_accept_success(self, create_and_delete_user):
+    def test_order_accept_success(self, create_and_delete_user, cancel_order_after_tests):
         new_courier = {"login": create_and_delete_user[1][0],
                         "password": create_and_delete_user[1][1]}
         courier_signin = requests.post(TestAPICourierLinks.main_url + TestAPICourierLinks.login_url, data=new_courier)
         courier_id = courier_signin.json()['id']
 
-        new_track = create_new_order()
+        new_track = cancel_order_after_tests()
         track_order = requests.get(TestAPIOrdersLinks.main_url + TestAPIOrdersLinks.track_order_url + str(new_track))
         order_id = track_order.json()['order']['id']
 
@@ -63,13 +62,13 @@ class TestAcceptOrder:
 
     @allure.description('Акцепт заказа при отправке данных без id курьера')
     @allure.title('Прием заказа без id курьера')
-    def test_order_accept_no_courier_id_fail(self, create_and_delete_user):
+    def test_order_accept_no_courier_id_fail(self, create_and_delete_user, cancel_order_after_tests):
         new_courier = {"login": create_and_delete_user[1][0],
                        "password": create_and_delete_user[1][1]}
         courier_signin = requests.post(TestAPICourierLinks.main_url + TestAPICourierLinks.login_url, data=new_courier)
         courier_id = courier_signin.json()['id']
 
-        new_track = create_new_order()
+        new_track = cancel_order_after_tests()
         track_order = requests.get(TestAPIOrdersLinks.main_url + TestAPIOrdersLinks.track_order_url + str(new_track))
         order_id = track_order.json()['order']['id']
 
@@ -82,13 +81,13 @@ class TestAcceptOrder:
 
     @allure.description('Акцепт заказа при отправке данных без id заказа')
     @allure.title('Прием заказа без id заказа')
-    def test_order_accept_no_order_id_fail(self, create_and_delete_user):
+    def test_order_accept_no_order_id_fail(self, create_and_delete_user, cancel_order_after_tests):
         new_courier = {"login": create_and_delete_user[1][0],
                            "password": create_and_delete_user[1][1]}
         courier_signin = requests.post(TestAPICourierLinks.main_url + TestAPICourierLinks.login_url, data=new_courier)
         courier_id = courier_signin.json()['id']
 
-        new_track = create_new_order()
+        new_track = cancel_order_after_tests()
         track_order = requests.get(TestAPIOrdersLinks.main_url + TestAPIOrdersLinks.track_order_url + str(new_track))
         order_id = track_order.json()['order']['id']
 
@@ -100,9 +99,9 @@ class TestAcceptOrder:
 
     @allure.description('Акцепт заказа с отправкой неверного id курьера')
     @allure.title('Прием заказа с некорректным id')
-    def test_order_accept_wrong_courier_id_fail(self):
+    def test_order_accept_wrong_courier_id_fail(self, cancel_order_after_tests):
         courier_id = non_existing_courier_id()
-        new_track = create_new_order()
+        new_track = cancel_order_after_tests()
         track_order = requests.get(TestAPIOrdersLinks.main_url + TestAPIOrdersLinks.track_order_url + str(new_track))
         order_id = track_order.json()['order']['id']
 
